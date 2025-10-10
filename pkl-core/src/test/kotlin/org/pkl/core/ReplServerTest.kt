@@ -68,6 +68,7 @@ class ReplServerTest {
           "toList()",
           "toMap()",
           "getProperty(",
+          "identical(",
           "getPropertyOrNull(",
           "hasProperty(",
           "ifNonNull(",
@@ -122,6 +123,7 @@ class ReplServerTest {
           "getProperty(",
           "getPropertyOrNull(",
           "hasProperty(",
+          "identical(",
           "relativePathTo(",
           "toString()",
         )
