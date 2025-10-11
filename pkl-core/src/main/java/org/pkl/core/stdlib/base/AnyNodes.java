@@ -25,6 +25,7 @@ import org.pkl.core.runtime.VmClass;
 import org.pkl.core.runtime.VmFunction;
 import org.pkl.core.runtime.VmNull;
 import org.pkl.core.runtime.VmObject;
+import org.pkl.core.runtime.VmValue;
 import org.pkl.core.stdlib.ExternalMethod0Node;
 import org.pkl.core.stdlib.ExternalMethod1Node;
 
@@ -74,7 +75,7 @@ public final class AnyNodes {
   public abstract static class identical extends ExternalMethod1Node {
 
     @Specialization
-    protected boolean eval(Object self, VmObject other) {
+    protected boolean eval(Object self, VmValue other) {
       return self == other;
     }
   }

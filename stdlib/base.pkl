@@ -55,7 +55,7 @@ abstract external class Any {
   external function ifNonNull<Result>(transform: (NonNull) -> Result): Result?
   
   /// Returns [true] if [other] is same as [this].
-  external function identical(other: Object): Boolean 
+  external function identical(other: Any): Boolean 
 }
 
 /// The type of [null] and null values created with [Null()].
