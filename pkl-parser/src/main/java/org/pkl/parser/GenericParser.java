@@ -77,8 +77,8 @@ public class GenericParser {
       }
       var lastImport = parseImportDecl();
       imports.add(lastImport);
-      // keep trailling affixes as part of the import
-      while (lookahead.isAffix() && lastImport.span.sameLine(spanLookahead)) {
+      // keep trailing affixes as part of the import
+      while (lookahead.isAffix() && lastImport.span.isSameLine(spanLookahead)) {
         imports.add(makeAffix(next()));
       }
       if (!isImport()) break;
@@ -662,7 +662,7 @@ public class GenericParser {
       if (operator.getPrec() < minPrecedence) break;
       // `-` and `[]` must be in the same line as the left operand and have no semicolons inbetween
       if ((operator == Operator.MINUS || operator == Operator.SUBSCRIPT)
-          && (fullOpToken.hasSemicolon || !expr.span.sameLine(fullOpToken.tk.span))) break;
+          && (fullOpToken.hasSemicolon || !expr.span.isSameLine(fullOpToken.tk.span))) break;
       var children = new ArrayList<Node>();
       children.add(expr);
       ff(children);
@@ -678,6 +678,10 @@ public class GenericParser {
           children.add(parseExpr("]"));
           ff(children);
           expect(Token.RBRACK, children, "unexpectedToken", "]");
+        }
+        case DOT, QDOT -> {
+          nodeType = NodeType.QUALIFIED_ACCESS_EXPR;
+          children.add(parseUnqualifiedAccessExpr());
         }
         case NON_NULL -> nodeType = NodeType.NON_NULL_EXPR;
         default -> children.add(parseExpr(expectation, nextMinPrec));
@@ -717,6 +721,16 @@ public class GenericParser {
       case NON_NULL -> Operator.NON_NULL;
       default -> null;
     };
+  }
+
+  private Node parseUnqualifiedAccessExpr() {
+    var children = new ArrayList<Node>();
+    children.add(parseIdentifier());
+    if (lookahead() == Token.LPAREN && noSemicolonInbetween() && _lookahead.newLinesBetween == 0) {
+      ff(children);
+      children.add(parseArgumentList());
+    }
+    return new Node(NodeType.UNQUALIFIED_ACCESS_EXPR, children);
   }
 
   private Node parseExprAtom(@Nullable String expectation) {
@@ -864,8 +878,8 @@ public class GenericParser {
             ff(children);
             var paramDef = new ArrayList<Node>();
             expect(Token.LPAREN, paramDef, "unexpectedToken", "(");
-            ff(paramDef);
             var param = new ArrayList<Node>();
+            ff(param);
             param.add(parseParameter());
             ff(param);
             expect(Token.ASSIGN, param, "unexpectedToken", "=");
@@ -884,16 +898,7 @@ public class GenericParser {
           case FLOAT -> new Node(NodeType.FLOAT_LITERAL_EXPR, next().span);
           case STRING_START -> parseSingleLineStringLiteralExpr();
           case STRING_MULTI_START -> parseMultiLineStringLiteralExpr();
-          case IDENTIFIER -> {
-            var children = new ArrayList<Node>();
-            children.add(parseIdentifier());
-            if (lookahead == Token.LPAREN
-                && noSemicolonInbetween()
-                && _lookahead.newLinesBetween == 0) {
-              children.add(parseArgumentList());
-            }
-            yield new Node(NodeType.UNQUALIFIED_ACCESS_EXPR, children);
-          }
+          case IDENTIFIER -> parseUnqualifiedAccessExpr();
           case EOF ->
               throw parserError(
                   ErrorMessages.create("unexpectedEndOfFile"), prev().span.stopSpan());
@@ -965,7 +970,7 @@ public class GenericParser {
         case STRING_PART -> {
           var tk = next();
           if (!tk.text(lexer).isEmpty()) {
-            children.add(make(NodeType.STRING_CONSTANT, tk.span));
+            children.add(make(NodeType.STRING_CHARS, tk.span));
           }
         }
         case STRING_ESCAPE_NEWLINE,
@@ -1004,7 +1009,7 @@ public class GenericParser {
         case STRING_PART -> {
           var tk = next();
           if (!tk.text(lexer).isEmpty()) {
-            children.add(make(NodeType.STRING_CONSTANT, tk.span));
+            children.add(make(NodeType.STRING_CHARS, tk.span));
           }
         }
         case STRING_NEWLINE -> children.add(make(NodeType.STRING_NEWLINE, next().span));
@@ -1164,7 +1169,12 @@ public class GenericParser {
               elements.add(parseType(")"));
               ff(elements);
               while (lookahead == Token.COMMA) {
-                elements.add(makeTerminal(next()));
+                var comma = next();
+                if (lookahead() == Token.RPAREN) {
+                  ff(elements);
+                  break;
+                }
+                elements.add(makeTerminal(comma));
                 ff(elements);
                 elements.add(parseType(")"));
                 totalTypes++;
@@ -1383,7 +1393,7 @@ public class GenericParser {
       }
     }
     children.add(makeTerminal(next())); // string end
-    return new Node(NodeType.STRING_CONSTANT, children);
+    return new Node(NodeType.STRING_CHARS, children);
   }
 
   private FullToken expect(Token type, String errorKey, Object... messageArgs) {

@@ -3,7 +3,7 @@
 // the following attributes must be updated immediately before a release
 
 // pkl version corresponding to current git commit without -dev suffix or git hash
-:pkl-version-no-suffix: 0.30.0
+:pkl-version-no-suffix: 0.31.0
 // tells whether pkl version corresponding to current git commit
 // is a release version (:is-release-version: '') or dev version (:!is-release-version:)
 :!is-release-version:
@@ -74,6 +74,9 @@ endif::[]
 :uri-stdlib-mathModule: {uri-pkl-stdlib-docs}/math
 :uri-stdlib-xmlModule: {uri-pkl-stdlib-docs}/xml
 :uri-stdlib-protobufModule: {uri-pkl-stdlib-docs}/protobuf
+:uri-stdlib-pklbinaryModule: {uri-pkl-stdlib-docs}/pklbinary
+:uri-stdlib-yamlModule: {uri-pkl-stdlib-docs}/yaml
+:uri-stdlib-YamlParser: {uri-stdlib-yamlModule}/Parser
 :uri-stdlib-evaluatorSettingsModule: {uri-pkl-stdlib-docs}/EvaluatorSettings
 :uri-stdlib-evaluatorSettingsHttpClass: {uri-stdlib-evaluatorSettingsModule}/Http
 :uri-stdlib-Boolean: {uri-stdlib-baseModule}/Boolean
@@ -130,7 +133,10 @@ endif::[]
 :uri-stdlib-Class: {uri-stdlib-baseModule}/Class
 :uri-stdlib-TypeAlias: {uri-stdlib-baseModule}/TypeAlias
 :uri-stdlib-Deprecated: {uri-stdlib-baseModule}/Deprecated
+:uri-stdlib-BaseValueRenderer: {uri-stdlib-baseModule}/BaseValueRenderer
 :uri-stdlib-ValueRenderer: {uri-stdlib-baseModule}/ValueRenderer
+:uri-stdlib-BytesRenderer: {uri-stdlib-baseModule}/BytesRenderer
+:uri-stdlib-YamlRenderer: {uri-stdlib-baseModule}/YamlRenderer
 :uri-stdlib-PcfRenderer-converters: {uri-stdlib-baseModule}/PcfRenderer#converters
 :uri-stdlib-Function: {uri-stdlib-baseModule}/Function
 :uri-stdlib-Function0: {uri-stdlib-baseModule}/Function0
