@@ -58,6 +58,9 @@ abstract external class Any {
   /// This method is the complement of the `??` operator and the equivalent of an `Option` type's
   /// `map` and `flatMap` methods.
   external function ifNonNull<Result>(transform: (NonNull) -> Result): Result?
+  
+  /// Returns [true] if [other] is same as [this].
+  external function identical(other: Any): Boolean 
 }
 
 /// The type of [null] and null values created with [Null()].
